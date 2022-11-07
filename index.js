@@ -1,18 +1,22 @@
-import express from 'express'
+const express = require('express')
 const app = express()
-const server = require('http').createServer(app)
-const io = require('socket.io')(server, {cors: { origin:"*" }})
+const http = require('http')
+const server = http.createServer(app) 
+const {Server} = require('socket.io')
 
+const io = new Server(server)
+
+app.set('views','./view')
 app.set("view engine","ejs")
 
-app.length('/home', (req,res)=>{
+app.get('/',(req,res)=>{
     res.render('home')
 })
 
-server.listen(3001,()=>{
-    console.log('server running...')
-})
 
 io.on('connection',(socket)=>{
-    console.log(`user connected ${socket.id}`)
+    console.log('made socket connection')
+})
+server.listen(3000, ()=> {
+    console.log('listening on : 3000')
 })
