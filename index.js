@@ -1,22 +1,33 @@
-const express = require('express')
-const app = express()
-const http = require('http')
-const server = http.createServer(app) 
-const {Server} = require('socket.io')
+const express = require("express");
+const app = express();
+const http = require("http");
+const path = require("path");
+const server = http.createServer(app);
+const { Server } = require("socket.io");
 
-const io = new Server(server)
+const io = new Server(server);
 
-app.set('views','./view')
-app.set("view engine","ejs")
+app.use(express.static("public"));
 
-app.get('/',(req,res)=>{
-    res.render('home')
-})
+// app.get('/',(req,res)=>{
+//     res.render('home')
+// })
 
+io.on("connection", (socket) => {
+  console.log("made socket connection " + socket.id);
 
-io.on('connection',(socket)=>{
-    console.log('made socket connection')
-})
-server.listen(3000, ()=> {
-    console.log('listening on : 3000')
-})
+  socket.on('chat',(data)=>{
+    io.sockets.emit('chat',data)
+  })
+
+  socket.on('typing',(data)=>{
+    socket.broadcast.emit('typing', data)
+  })
+
+  socket.on("disconnect", () => {
+    console.log("user disconnected " + socket.id);
+  });
+});
+server.listen(3000, () => {
+  console.log("listening on : 3000");
+});
